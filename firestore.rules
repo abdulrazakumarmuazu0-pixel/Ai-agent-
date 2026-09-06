@@ -1,0 +1,64 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    // users/{uid} - profile document, keyed by the Firebase Auth uid.
+    // The backend (Admin SDK, verified ID token) does almost all writes
+    // via /api/auth/register and /api/auth/profile; these rules are the
+    // safety net if the client ever talks to Firestore directly.
+    match /users/{userId} {
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId);
+      // Never let a client change their own role/plan/limits/usage.
+      allow update: if isOwner(userId)
+        && !('role' in request.resource.data.diff(resource.data).affectedKeys())
+        && !('plan' in request.resource.data.diff(resource.data).affectedKeys())
+        && !('limits' in request.resource.data.diff(resource.data).affectedKeys())
+        && !('usage' in request.resource.data.diff(resource.data).affectedKeys());
+      allow delete: if false;
+    }
+
+    match /conversations/{conversationId} {
+      allow read, delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow update: if isSignedIn() && resource.data.userId == request.auth.uid;
+    }
+
+    match /messages/{messageId} {
+      allow read, delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow update: if false; // messages are immutable once written
+    }
+
+    match /files/{fileId} {
+      allow read, delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow update: if isSignedIn() && resource.data.userId == request.auth.uid;
+    }
+
+    match /memory/{memoryId} {
+      allow read, delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow update: if isSignedIn() && resource.data.userId == request.auth.uid;
+    }
+
+    // Health-check doc written by the backend at startup - no client access.
+    match /_health/{docId} {
+      allow read, write: if false;
+    }
+
+    // Default deny for anything not covered above.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
