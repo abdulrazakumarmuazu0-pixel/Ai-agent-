@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="AI Agent - Intelligent assistant for tasks, search, and file processing">
+  <meta name="theme-color" content="#6366f1">
+  <title>AI Agent</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192x192.png">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div id="app">
+    <!-- Auth Screen -->
+    <div id="auth-screen" class="screen active">
+      <div class="auth-container">
+        <div class="auth-logo">
+          <div class="logo-icon">🤖</div>
+          <h1 data-i18n="appName">AI Agent</h1>
+          <p data-i18n="appTagline">Your Intelligent Assistant</p>
+        </div>
+        <div class="auth-tabs">
+          <button class="auth-tab active" data-tab="login" data-i18n="login">Login</button>
+          <button class="auth-tab" data-tab="register" data-i18n="register">Register</button>
+        </div>
+        <form id="login-form" class="auth-form active">
+          <div class="form-group">
+            <label data-i18n="email">Email</label>
+            <input type="email" id="login-email" required placeholder="your@email.com">
+          </div>
+          <div class="form-group">
+            <label data-i18n="password">Password</label>
+            <input type="password" id="login-password" required placeholder="••••••••">
+          </div>
+          <button type="submit" class="btn btn-primary btn-block" data-i18n="login">Login</button>
+          <p class="auth-error" id="login-error"></p>
+        </form>
+        <form id="register-form" class="auth-form">
+          <div class="form-group">
+            <label data-i18n="displayName">Display Name</label>
+            <input type="text" id="register-name" required placeholder="John Doe">
+          </div>
+          <div class="form-group">
+            <label data-i18n="email">Email</label>
+            <input type="email" id="register-email" required placeholder="your@email.com">
+          </div>
+          <div class="form-group">
+            <label data-i18n="password">Password</label>
+            <input type="password" id="register-password" required placeholder="Min 8 characters">
+          </div>
+          <div class="form-group">
+            <label data-i18n="language">Language</label>
+            <select id="register-language">
+              <option value="en">English</option>
+              <option value="ha">Hausa</option>
+              <option value="ar">العربية</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block" data-i18n="register">Register</button>
+          <p class="auth-error" id="register-error"></p>
+        </form>
+
+        <div class="auth-divider"><span data-i18n="orContinueWith">or continue with</span></div>
+        <button type="button" id="google-signin-btn" class="btn btn-google btn-block">
+          <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
+            <path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.71v2.26h2.92A8.78 8.78 0 0 0 17.64 9.2z"/>
+            <path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.19l-2.92-2.26c-.81.54-1.85.87-3.04.87a5.4 5.4 0 0 1-5.08-3.72H.9v2.34A9 9 0 0 0 9 18z"/>
+            <path fill="#FBBC05" d="M3.92 10.7A5.4 5.4 0 0 1 3.63 9c0-.59.1-1.16.29-1.7V4.96H.9A9 9 0 0 0 0 9c0 1.45.35 2.83.9 4.04l3.02-2.34z"/>
+            <path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.58A8.59 8.59 0 0 0 9 0 9 9 0 0 0 .9 4.96l3.02 2.34A5.4 5.4 0 0 1 9 3.58z"/>
+          </svg>
+          <span data-i18n="continueWithGoogle">Continue with Google</span>
+        </button>
+        <p class="auth-error" id="google-error"></p>
+      </div>
+    </div>
+
+    <!-- Main App Screen -->
+    <div id="main-screen" class="screen">
+      <aside id="sidebar" class="sidebar">
+        <div class="sidebar-header">
+          <div class="logo-icon">🤖</div>
+          <span class="app-name">AI Agent</span>
+          <button id="sidebar-close" class="icon-btn mobile-only">✕</button>
+        </div>
+        <button id="new-chat-btn" class="btn btn-new-chat">
+          <span>+</span>
+          <span data-i18n="newChat">New Chat</span>
+        </button>
+        <div class="conversations-list" id="conversations-list"></div>
+        <div class="sidebar-footer">
+          <div class="user-info" id="user-info">
+            <div class="user-avatar" id="user-avatar">U</div>
+            <div class="user-details">
+              <span class="user-name" id="user-name">User</span>
+              <span class="user-plan" id="user-plan">Free</span>
+            </div>
+          </div>
+          <div class="sidebar-actions">
+            <button id="settings-btn" class="icon-btn" title="Settings">⚙️</button>
+            <button id="logout-btn" class="icon-btn" title="Logout">🚪</button>
+          </div>
+        </div>
+      </aside>
+
+      <main class="chat-area">
+        <header class="chat-header">
+          <button id="sidebar-toggle" class="icon-btn mobile-only">☰</button>
+          <h2 id="chat-title">New Conversation</h2>
+          <div class="header-actions">
+            <button id="search-btn" class="icon-btn" title="Web Search">🔍</button>
+            <button id="voice-btn" class="icon-btn" title="Voice Input">🎤</button>
+            <button id="file-btn" class="icon-btn" title="Upload File">📎</button>
+            <button id="language-btn" class="icon-btn" title="Language">🌐</button>
+          </div>
+        </header>
+
+        <div id="messages-container" class="messages-container">
+          <div class="welcome-message" id="welcome-message">
+            <div class="welcome-icon">🤖</div>
+            <h2 data-i18n="welcomeTitle">How can I help you today?</h2>
+            <p data-i18n="welcomeSubtitle">Ask me anything, search the web, or upload files.</p>
+            <div class="quick-actions">
+              <button class="quick-action" data-prompt="Explain quantum computing"><span>⚛️</span><span>Explain quantum computing</span></button>
+              <button class="quick-action" data-prompt="Search for latest tech news"><span>📰</span><span>Latest tech news</span></button>
+              <button class="quick-action" data-prompt="Help me write an email"><span>✉️</span><span>Write an email</span></button>
+              <button class="quick-action" data-prompt="Translate to Hausa"><span>🌍</span><span>Translate to Hausa</span></button>
+            </div>
+          </div>
+        </div>
+
+        <div class="input-area">
+          <div class="input-container">
+            <textarea id="message-input" placeholder="Type your message..." rows="1" data-i18n-placeholder="typeMessage"></textarea>
+            <div class="input-actions">
+              <button id="send-btn" class="btn btn-send" disabled>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+              </button>
+            </div>
+          </div>
+          <p class="input-hint" data-i18n="inputHint">Press Enter to send, Shift+Enter for new line</p>
+        </div>
+      </main>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 data-i18n="settings">Settings</h3>
+          <button class="modal-close">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="setting-item">
+            <label data-i18n="theme">Theme</label>
+            <select id="setting-theme"><option value="light">Light</option><option value="dark">Dark</option><option value="auto">Auto</option></select>
+          </div>
+          <div class="setting-item">
+            <label data-i18n="language">Language</label>
+            <select id="setting-language"><option value="en">English</option><option value="ha">Hausa</option><option value="ar">العربية</option></select>
+          </div>
+          <div class="setting-item">
+            <label data-i18n="notifications">Notifications</label>
+            <label class="toggle"><input type="checkbox" id="setting-notifications"><span class="toggle-slider"></span></label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- File Upload Modal -->
+    <div id="file-modal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 data-i18n="uploadFile">Upload File</h3>
+          <button class="modal-close">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="file-drop-zone" id="file-drop-zone">
+            <div class="file-drop-icon">📁</div>
+            <p data-i18n="dropFileHere">Drop file here or click to browse</p>
+            <input type="file" id="file-input" hidden>
+          </div>
+          <div class="file-info" id="file-info"></div>
+          <button id="file-upload-btn" class="btn btn-primary btn-block" disabled data-i18n="upload">Upload</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="toast-container"></div>
+  </div>
+
+  <!-- Firebase (compat build - plain globals, works with the classic
+       scripts below without needing type="module" / bundling) -->
+  <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
+
+  <script src="js/i18n.js"></script>
+  <script src="js/api-client.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/chat.js"></script>
+  <script src="js/file-handler.js"></script>
+  <script src="js/voice.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js').then(reg => console.log('SW registered')).catch(err => console.log('SW error:', err));
+    }
+  </script>
+</body>
+</html>
