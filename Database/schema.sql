@@ -1,0 +1,55 @@
+-- Firestore Collections Structure (NoSQL)
+
+-- users/{uid}
+--   email: string
+--   displayName: string
+--   role: string (user|admin|superadmin)
+--   status: string (active|suspended|banned)
+--   language: string (en|ha|ar)
+--   plan: string (free|pro|enterprise)
+--   createdAt: timestamp
+--   updatedAt: timestamp
+--   preferences: map
+--   usage: map
+--   limits: map
+
+-- conversations/{id}
+--   userId: string
+--   title: string
+--   language: string
+--   status: string
+--   createdAt: timestamp
+--   updatedAt: timestamp
+--   messageCount: number
+
+-- messages/{id}
+--   conversationId: string
+--   userId: string
+--   role: string (user|assistant|system)
+--   content: string
+--   type: string
+--   language: string
+--   tokens: number
+--   createdAt: timestamp
+--   status: string
+
+-- files/{id}
+--   userId: string
+--   conversationId: string
+--   originalName: string
+--   mimeType: string
+--   size: number
+--   path: string
+--   status: string
+--   extractedText: string
+--   createdAt: timestamp
+
+-- memories/{id}
+--   userId: string
+--   key: string
+--   value: string
+--   type: string
+--   importance: number
+--   expiresAt: timestamp
+--   accessCount: number
+--   createdAt: timestamp
